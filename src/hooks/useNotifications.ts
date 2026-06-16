@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession } from '@/hooks/useAuthSession';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { RealtimePostgresInsertPayload } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 interface Notifikasi {
   id: string;
@@ -16,6 +17,7 @@ interface Notifikasi {
 }
 
 export function useNotifications() {
+  const router = useRouter();
   const { data: session } = useSession();
   const [notifikasi, setNotifikasi] = useState<Notifikasi[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,9 +44,10 @@ export function useNotifications() {
     fetchNotifikasi();
 
     const supabase = createSupabaseBrowserClient();
-    const channelName = `notifikasi:${session.user.id}:${Date.now()}:${Math.random()
+    const channelName = `realtime:${session.user.id}:${Date.now()}:${Math.random()
       .toString(36)
       .slice(2)}`;
+    
     const channel = supabase
       .channel(channelName)
       .on(
@@ -57,7 +60,22 @@ export function useNotifications() {
         (payload: RealtimePostgresInsertPayload<Notifikasi>) => {
           if (payload.new && payload.new.userId === session.user.id) {
             setNotifikasi((prev) => [payload.new as Notifikasi, ...prev]);
+            
+            // PENTING: Panggil router.refresh() agar Next.js memuat ulang data Server Components
+            router.refresh();
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'Laporan',
+        },
+        () => {
+          // Setiap kali ada perubahan di tabel Laporan, refresh halaman
+          router.refresh();
         }
       )
       .subscribe();
@@ -65,7 +83,7 @@ export function useNotifications() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [session?.user?.id, fetchNotifikasi]);
+  }, [session?.user?.id, fetchNotifikasi, router]);
 
   const tandaiBacaSemua = useCallback(async () => {
     await fetch('/api/notifikasi', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });

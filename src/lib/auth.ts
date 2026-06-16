@@ -23,7 +23,7 @@ function getMetadataName(authUser: { email?: string; user_metadata?: Record<stri
 }
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user: authUser },
   } = await supabase.auth.getUser();
@@ -71,7 +71,7 @@ export async function getCurrentSession(): Promise<CurrentSession | null> {
 }
 
 export async function getSupabaseAuthUser() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -7,14 +7,15 @@ export const dynamic = 'force-dynamic';
 // DELETE /api/komentar/[id]
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getCurrentSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Tidak terautentikasi.' }, { status: 401 });
   }
 
-  const komentar = await prisma.komentar.findUnique({ where: { id: params.id } });
+  const komentar = await prisma.komentar.findUnique({ where: { id } });
 
   if (!komentar) {
     return NextResponse.json({ error: 'Komentar tidak ditemukan.' }, { status: 404 });
@@ -27,7 +28,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Tidak diizinkan.' }, { status: 403 });
   }
 
-  await prisma.komentar.delete({ where: { id: params.id } });
+  await prisma.komentar.delete({ where: { id } });
 
   return NextResponse.json({ success: true });
 }

@@ -9,32 +9,26 @@ import KomentarSection from '@/components/komentar/KomentarSection';
 import StatusTimeline from '@/components/laporan/StatusTimeline';
 import DeleteLaporanButton from '@/components/laporan/DeleteLaporanButton';
 import { CLOUDINARY_DETAIL_IMAGE_OPTIONS, getCloudinaryImageUrl } from '@/lib/cloudinary';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
-
-const MapView = dynamic(() => import('@/components/map/MapView'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-48 w-full bg-surface-container-low rounded-xl animate-pulse" />
-  ),
-});
+import MapView from '@/components/map/MapViewClient';
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function DetailLaporanPage({ params }: Props) {
+  const { id } = await params;
   const session = await getCurrentSession();
   const userId = session?.user?.id;
 
   // ── Smart Redirect: Admin → Admin Dashboard ──────────────────────────────
   // Jika user adalah admin, redirect ke halaman admin detail
   if (session?.user?.role === 'ADMIN') {
-    redirect(`/dashboard/laporan/${params.id}`);
+    redirect(`/dashboard/laporan/${id}`);
   }
 
   const laporan = await prisma.laporan.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       kategori: true,
       user: { select: { id: true, name: true } },

@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const emailRedirectTo = `${getAppUrl(req)}/auth/callback?next=/beranda`;
 
     const { data, error } = await supabase.auth.signUp({

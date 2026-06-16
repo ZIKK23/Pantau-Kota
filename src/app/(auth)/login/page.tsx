@@ -1,10 +1,10 @@
 import AuthScreen from "@/components/auth/AuthScreen";
 
 type LoginPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     error?: string;
     notice?: string;
-  };
+  }>;
 };
 
 const errorMessages: Record<string, string> = {
@@ -16,12 +16,13 @@ const noticeMessages: Record<string, string> = {
   'email-confirmed': 'Email berhasil dikonfirmasi. Silakan masuk.',
 };
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
   return (
     <AuthScreen
       defaultIsLogin={true}
-      initialError={searchParams?.error ? errorMessages[searchParams.error] ?? '' : ''}
-      initialNotice={searchParams?.notice ? noticeMessages[searchParams.notice] ?? '' : ''}
+      initialError={params?.error ? errorMessages[params.error] ?? '' : ''}
+      initialNotice={params?.notice ? noticeMessages[params.notice] ?? '' : ''}
     />
   );
 }

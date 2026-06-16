@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=invalid-confirmation', url.origin));
   }
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {

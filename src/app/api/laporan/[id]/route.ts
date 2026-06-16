@@ -10,8 +10,9 @@ export const dynamic = 'force-dynamic';
 // GET /api/laporan/[id] — Detail laporan
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getCurrentSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Tidak terautentikasi.' }, { status: 401 });
@@ -19,7 +20,7 @@ export async function GET(
 
   try {
     const laporan = await prisma.laporan.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         judul: true,
@@ -67,8 +68,9 @@ const STATUS_LABEL: Record<string, string> = {
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getCurrentSession();
 
   if (!session) {
@@ -92,7 +94,7 @@ export async function PATCH(
     const { status, catatanAdmin, fotoPenyelesaian } = result.data;
 
     const existing = await prisma.laporan.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { id: true, status: true },
     });
 
@@ -101,7 +103,7 @@ export async function PATCH(
     }
 
     const updated = await prisma.laporan.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(status !== undefined ? { status } : {}),
         ...(catatanAdmin !== undefined ? { catatanAdmin } : {}),
@@ -166,8 +168,9 @@ export async function PATCH(
 // Ketentuan: hanya pemilik laporan, dalam 24 jam sejak dibuat, dan status masih MENUNGGU
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getCurrentSession();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Tidak terautentikasi.' }, { status: 401 });
@@ -175,7 +178,7 @@ export async function DELETE(
 
   try {
     const laporan = await prisma.laporan.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { id: true, userId: true, status: true, createdAt: true },
     });
 
@@ -210,10 +213,10 @@ export async function DELETE(
 
     // Hapus semua relasi lalu hapus laporan dalam satu transaksi
     await prisma.$transaction([
-      prisma.komentar.deleteMany({ where: { laporanId: params.id } }),
-      prisma.vote.deleteMany({ where: { laporanId: params.id } }),
-      prisma.notifikasi.deleteMany({ where: { laporanId: params.id } }),
-      prisma.laporan.delete({ where: { id: params.id } }),
+      prisma.komentar.deleteMany({ where: { laporanId: id } }),
+      prisma.vote.deleteMany({ where: { laporanId: id } }),
+      prisma.notifikasi.deleteMany({ where: { laporanId: id } }),
+      prisma.laporan.delete({ where: { id } }),
     ]);
 
     return NextResponse.json({ success: true });

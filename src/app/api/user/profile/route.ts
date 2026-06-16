@@ -100,7 +100,7 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ message: 'Password saat ini diperlukan' }, { status: 400 });
       }
 
-      const supabase = createSupabaseServerClient();
+      const supabase = await createSupabaseServerClient();
       const { error: verifyError } = await supabase.auth.signInWithPassword({
         email: currentUser.email,
         password: currentPassword,

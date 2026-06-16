@@ -7,8 +7,9 @@ export const dynamic = 'force-dynamic';
 // PATCH /api/user/[id] — Admin aktifkan/nonaktifkan user
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getCurrentSession();
 
   if (!session) {
@@ -27,7 +28,7 @@ export async function PATCH(
     }
 
     // Cegah admin nonaktifkan dirinya sendiri
-    if (params.id === session.user.id) {
+    if (id === session.user.id) {
       return NextResponse.json(
         { error: "Tidak bisa menonaktifkan akun sendiri" },
         { status: 400 }
@@ -35,7 +36,7 @@ export async function PATCH(
     }
 
     const user = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: { isActive },
       select: { id: true, name: true, email: true, isActive: true },
     });
@@ -50,8 +51,9 @@ export async function PATCH(
 // DELETE /api/user/[id] — Admin hapus user
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getCurrentSession();
 
   if (!session) {
@@ -62,7 +64,7 @@ export async function DELETE(
   }
 
   // Cegah admin hapus dirinya sendiri
-  if (params.id === session.user.id) {
+  if (id === session.user.id) {
     return NextResponse.json(
       { error: "Tidak bisa menghapus akun sendiri" },
       { status: 400 }
@@ -71,7 +73,7 @@ export async function DELETE(
 
   try {
     await prisma.user.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "User berhasil dihapus" });

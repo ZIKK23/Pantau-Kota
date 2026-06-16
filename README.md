@@ -1,129 +1,105 @@
-# PantauKota
+# 1. Project Name
+**PantauKota**
 
-PWA pelaporan masalah perkotaan untuk warga dan admin.
+---
 
-Warga dapat membuat laporan dengan foto/lokasi, vote, komentar, melihat notifikasi, dan menghapus laporan sendiri jika masih memenuhi aturan. Admin dapat meninjau laporan, mengubah status, mengelola kategori, user, dan melihat dashboard.
+# 2. Short Description
+PantauKota is a Progressive Web App (PWA) designed for modern urban infrastructure reporting:
+- **Connects** citizens directly with city administrators.
+- **Empowers** residents to easily report public issues (e.g., potholes, broken streetlights).
+- **Provides** administrators with a powerful dashboard to track, manage, and resolve reports efficiently.
 
-## Stack
+---
 
-| Area | Teknologi |
-| --- | --- |
-| Frontend | Next.js 14 App Router, React 18, TypeScript, Tailwind CSS |
-| Backend | Next.js Route Handlers |
-| Auth | Supabase Auth |
-| Database | Supabase PostgreSQL + Prisma 7 |
-| Realtime | Supabase Realtime |
-| Images | Cloudinary public id + delivery transformations |
-| Maps | Leaflet + React-Leaflet |
-| Email | Resend |
-| Deploy | Vercel |
+# 3. Problem Solved
+**The Challenges:**
+- ❌ **Untransparent Process**: Citizens don't know where to report issues or how to track their status.
+- ❌ **Duplicate Reports**: City administrators are overwhelmed by multiple reports of the exact same issue.
+- ❌ **Poor Prioritization**: Lack of a centralized system makes it hard to know which infrastructure problem is the most critical.
 
-## Setup
+**The Solution (PantauKota):**
+- ✅ **Unified Platform**: A single, transparent portal for all infrastructure reports.
+- ✅ **Geo-tagged & Visual**: Reports include exact GPS coordinates and photographic evidence.
+- ✅ **Community Validation**: Citizens can upvote reports to automatically flag them as high priority.
+- ✅ **Real-time Tracking**: Instant status updates and notifications keep the public informed at all times.
 
-```bash
-npm install
-npx prisma generate
-npm run dev
-```
+---
 
-Buka `http://localhost:3000`.
+# 4. Key Features
+- **Geo-tagged Reporting**: Submit reports with exact GPS locations and photos.
+- **Community Voting & Comments**: Upvote reports to validate urgency and add context via comments.
+- **Automated Prioritization**: Priority scores calculated automatically based on upvotes and report age.
+- **Real-time Synchronization**: WebSockets provide instant UI updates and notifications without page reloads.
+- **Admin Dashboard**: Comprehensive control panel to review reports, update statuses, and manage users.
+- **Progressive Web App (PWA)**: Installable on mobile devices with offline caching support.
 
-## Environment
+---
 
-Lihat `.env.example`. Minimal:
+# 5. Tech Stack & Reasons
 
-```env
-DATABASE_URL="postgresql://postgres.<project-ref>:<password>@<pooler-host>:6543/postgres?pgbouncer=true"
-DIRECT_URL="postgresql://postgres.<project-ref>:<password>@<pooler-host>:5432/postgres"
+| Technology | Purpose | Reason for Choosing |
+| :--- | :--- | :--- |
+| **Next.js 15 (App Router)** | Frontend & API Framework | Robust Server-Side Rendering (SSR) and seamless API Route Handlers. |
+| **TypeScript** | Programming Language | Type safety reduces runtime errors and improves maintainability. |
+| **Tailwind CSS** | Styling | Rapid UI development using a utility-first approach. |
+| **Supabase PostgreSQL** | Database & Auth | Scalable managed PostgreSQL with built-in Authentication and RLS. |
+| **Prisma ORM** | Database Access | Strongly-typed database client for intuitive and safe querying. |
+| **Supabase Realtime** | WebSocket Subscriptions | Enables instant push notifications and live UI updates effortlessly. |
+| **Leaflet & React-Leaflet** | Interactive Maps | Lightweight library for mapping and geolocation data. |
+| **Cloudinary** | Image Storage & CDN | Secure image uploads with on-the-fly transformations. |
+| **Resend** | Email Service | Reliable transactional notifications for status updates. |
 
-NEXT_PUBLIC_SUPABASE_URL="https://<project-ref>.supabase.co"
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="sb_publishable_xxx"
-SUPABASE_SERVICE_ROLE_KEY="sb_secret_or_service_role_xxx"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+---
 
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="..."
-CLOUDINARY_API_KEY="..."
-CLOUDINARY_API_SECRET="..."
-RESEND_API_KEY="..."
-```
+# 6. How to Install and Run
 
-`NEXT_PUBLIC_APP_URL` dipakai untuk link konfirmasi Supabase Auth dan link email aplikasi. Di production isi dengan domain Vercel/custom domain.
+### Prerequisites
+- **Node.js** (v20 or higher)
+- **Supabase** Project (Database & Auth)
+- **Cloudinary** Account (Images)
+- **Resend** Account (Emails)
 
-## Database Baru
+### Installation Steps
 
-Jika database Supabase masih kosong:
+1. **Clone & Install**:
+   ```bash
+   cd PantauKota
+   npm install
+   ```
 
-```bash
-npx prisma migrate deploy
-npm run seed
-```
+2. **Environment Variables**:
+   Copy `.env.example` to `.env` and fill in:
+   ```env
+   # Database
+   DATABASE_URL="postgresql://...:6543/postgres?pgbouncer=true"
+   DIRECT_URL="postgresql://...:5432/postgres"
+   
+   # Supabase Auth
+   NEXT_PUBLIC_SUPABASE_URL="https://<project-ref>.supabase.co"
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-anon-key"
+   SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+   
+   # App URL
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   
+   # Cloudinary
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your-cloud-name"
+   CLOUDINARY_API_KEY="your-api-key"
+   CLOUDINARY_API_SECRET="your-api-secret"
+   
+   # Resend
+   RESEND_API_KEY="your-resend-api-key"
+   ```
 
-Jika `migrate deploy` gagal karena koneksi direct/session pooler, jalankan isi `prisma/supabase-init.sql` di Supabase SQL Editor, lalu:
+3. **Database Setup**:
+   ```bash
+   npx prisma migrate deploy
+   npx prisma generate
+   npm run seed  # Optional: Seed dummy data and admin user
+   ```
 
-```bash
-npx prisma generate
-npm run seed
-```
-
-Seed akan membuat data dummy dan akun Supabase Auth jika `SUPABASE_SERVICE_ROLE_KEY` valid.
-
-## Akun Testing
-
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin | `admin@pantaukota.id` | `password123` |
-| Warga | `budi@warga.id` | `password123` |
-| Warga | `siti@warga.id` | `password123` |
-| Warga | `dewi@warga.id` | `password123` |
-
-## Struktur Singkat
-
-```text
-prisma/
-  schema.prisma
-  seed.ts
-  supabase-init.sql
-src/
-  app/                 Next.js routes dan API
-  components/          UI, layout, laporan, map, komentar
-  hooks/               auth session, notification, vote, map, toast
-  lib/                 auth, supabase, prisma, email, cloudinary, helpers
-  types/               shared types laporan
-public/                assets PWA dan logo
-```
-
-## Gambar Laporan
-
-Upload gambar tetap lewat `/api/upload` server-side ke Cloudinary. Response API berisi `publicId` dan `url`, tetapi data baru menyimpan `publicId` ke field lama:
-
-- `foto: string[]`
-- `fotoPenyelesaian: string | null`
-
-Kolom database belum di-rename agar data lama aman. Render gambar memakai `getCloudinaryImageUrl()` di `src/lib/cloudinary.ts`, sehingga nilai baru berbentuk `pantaukota/...` dan URL lama Cloudinary/Unsplash tetap bisa ditampilkan. Kompresi client memakai `browser-image-compression` lewat `src/lib/client-image.ts` sebelum upload.
-
-## Dokumentasi
-
-- `AGENTS.md`: panduan coding untuk AI/agent.
-- `MAINTENANCE.md`: operasional, env, deploy, troubleshooting.
-- `DESIGN.md`: desain visual.
-- `docs/SUPABASE-ARCHITECTURE.md`: arsitektur Supabase.
-- `docs/SUPABASE-MIGRATION.md`: setup/migrasi Supabase.
-- `docs/CLOUDINARY-IMAGES.md`: flow gambar Cloudinary dan kompatibilitas data lama.
-- `docs/EMAIL-SERVICE.md`: konfigurasi email Resend.
-
-## Verifikasi
-
-```bash
-npx tsc --noEmit
-npx tsc -p tsconfig.seed.json --noEmit
-```
-
-Manual smoke test:
-- Login warga dan admin.
-- Register user baru, cek banner konfirmasi email, lalu klik link konfirmasi.
-- Buat laporan dengan foto; DB harus menyimpan `pantaukota/...` public id.
-- Vote dan komentar.
-- Admin update status dan upload foto penyelesaian; `fotoPenyelesaian` juga public id.
-- Notifikasi realtime muncul.
-- Peta tampil tanpa area abu-abu.
-- UI rapi di mobile 360px.
+4. **Run Server**:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.

@@ -14,8 +14,9 @@ async function requireAdmin() {
 // PATCH /api/kategori/[id] — Edit nama/icon/warna ATAU toggle isActive
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = await requireAdmin();
     if (!session) {
@@ -26,7 +27,7 @@ export async function PATCH(
     const { nama, icon, warna, isActive } = body;
 
     // Cek kategori ada
-    const existing = await prisma.kategori.findUnique({ where: { id: params.id } });
+    const existing = await prisma.kategori.findUnique({ where: { id } });
     if (!existing) {
       return NextResponse.json({ error: 'Kategori tidak ditemukan.' }, { status: 404 });
     }
@@ -43,7 +44,7 @@ export async function PATCH(
     }
 
     const updated = await prisma.kategori.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(nama !== undefined && { nama: nama.trim() }),
         ...(icon !== undefined && { icon: icon?.trim() || null }),
@@ -71,8 +72,9 @@ export async function PATCH(
 // DELETE /api/kategori/[id] — Hapus kategori (hanya jika tidak ada laporan terkait)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = await requireAdmin();
     if (!session) {
@@ -81,7 +83,7 @@ export async function DELETE(
 
     // Cek kategori ada
     const existing = await prisma.kategori.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { _count: { select: { laporan: true } } },
     });
     if (!existing) {
@@ -98,7 +100,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.kategori.delete({ where: { id: params.id } });
+    await prisma.kategori.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {

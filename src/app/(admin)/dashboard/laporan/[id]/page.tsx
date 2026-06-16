@@ -8,22 +8,16 @@ import KomentarSection from '@/components/komentar/KomentarSection';
 import StatusTimeline from '@/components/laporan/StatusTimeline';
 import PrioritasScore from '@/components/laporan/PrioritasScore';
 import { CLOUDINARY_DETAIL_IMAGE_OPTIONS, getCloudinaryImageUrl } from '@/lib/cloudinary';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import AdminStatusUpdater from './AdminStatusUpdater';
-
-const AdminMapView = dynamic(() => import('@/components/map/AdminMapView'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-full w-full bg-surface-container-low rounded-xl animate-pulse" />
-  ),
-});
+import AdminMapView from '@/components/map/AdminMapViewClient';
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function AdminDetailLaporanPage({ params }: Props) {
+  const { id } = await params;
   const session = await getCurrentSession();
 
   if (!session || session.user.role !== 'ADMIN') {
@@ -31,7 +25,7 @@ export default async function AdminDetailLaporanPage({ params }: Props) {
   }
 
   const laporan = await prisma.laporan.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       kategori: true,
       user: { select: { id: true, name: true, email: true } },

@@ -59,7 +59,7 @@ export default function AuthScreen({ defaultIsLogin = true, initialError = '', i
     setIsLoading(false);
 
     if (!session?.user) {
-      setError('Akun berhasil masuk di Supabase Auth, tetapi profil aplikasi belum siap. Coba muat ulang halaman lalu masuk lagi.');
+      setError('Akun Anda telah dinonaktifkan oleh Administrator. Silakan hubungi kami untuk informasi lebih lanjut.');
       await supabase.auth.signOut();
       return;
     }

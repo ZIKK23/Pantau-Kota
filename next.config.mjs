@@ -1,20 +1,8 @@
-import withPWAInit from "next-pwa";
-
-const withPWA = withPWAInit({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  register: true,
-  skipWaiting: true,
-  buildExcludes: [
-    /app-build-manifest\.json$/,
-    /middleware-build-manifest\.js$/,
-    /middleware-manifest\.json$/,
-  ],
-});
+import withSerwist from "@serwist/next";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false, // Disabled: react-leaflet is incompatible with Strict Mode's double-mount
   images: {
     remotePatterns: [
       {
@@ -59,4 +47,8 @@ const nextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default withSerwist({
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
+})(nextConfig);
