@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String       @id @default(cuid())
+  name       String
+  email      String       @unique
+  role       Role         @default(WARGA)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  isActive   Boolean      @default(true)
+  komentar   Komentar[]
+  laporan    Laporan[]
+  notifikasi Notifikasi[]
+  votes      Vote[]
+}
+
+model Laporan {
+  id               String     @id @default(cuid())
+  userId           String
+  judul            String
+  deskripsi        String
+  kategoriId       String
+  foto             String[]
+  latitude         Float
+  longitude        Float
+  alamat           String?
+  status           Status     @default(MENUNGGU)
+  voteCount        Int        @default(0)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  selesaiAt        DateTime?
+  catatanAdmin     String?
+  fotoPenyelesaian String?
+  prioritas        Boolean    @default(false)
+  komentar         Komentar[]
+  kategori         Kategori   @relation(fields: [kategoriId], references: [id])
+  user             User       @relation(fields: [userId], references: [id])
+  votes            Vote[]
+
+  @@index([status, selesaiAt])
+  @@index([kategoriId, status])
+  @@index([userId, status])
+  @@index([latitude, longitude])
+  @@index([createdAt])
+}
+
+model Kategori {
+  id        String    @id @default(cuid())
+  nama      String    @unique
+  icon      String?
+  warna     String?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  laporan   Laporan[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  userId    String
+  laporanId String
+  createdAt DateTime @default(now())
+  laporan   Laporan  @relation(fields: [laporanId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, laporanId])
+}
+
+model Komentar {
+  id        String   @id @default(cuid())
+  userId    String
+  laporanId String
+  isi       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  laporan   Laporan  @relation(fields: [laporanId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Notifikasi {
+  id        String   @id @default(cuid())
+  userId    String
+  judul     String
+  pesan     String
+  laporanId String?
+  dibaca    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, dibaca])
+  @@index([createdAt])
+}
+
+enum Role {
+  WARGA
+  ADMIN
+}
+
+enum Status {
+  MENUNGGU
+  DIPROSES
+  SELESAI
+}

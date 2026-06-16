@@ -1,0 +1,123 @@
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Animation for toast notifications (PBI-10) */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+}
+
+@layer base {
+  /* Prevent horizontal scroll globally */
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  :root {
+    --surface: #f7f9fb;
+    --surface-container-low: #f0f4f7;
+    --surface-container-lowest: #ffffff;
+    --surface-container-high: #e1e9ee;
+    --outline-variant: #a9b4b9;
+    --primary-color: #426464;
+    --on-primary: #ffffff;
+    --primary-dim: #365858;
+    --tertiary: #006d4a;
+    --error: #9f403d;
+    --on-surface: #2a3439;
+
+    /* Shadcn Overrides based on Civic Clarity */
+    --background: var(--surface);
+    --foreground: var(--on-surface);
+    --card: var(--surface-container-lowest);
+    --card-foreground: var(--on-surface);
+    --popover: var(--surface-container-lowest);
+    --popover-foreground: var(--on-surface);
+    --primary: var(--primary-color);
+    --primary-foreground: var(--on-primary);
+    --secondary: var(--surface-container-high);
+    --secondary-foreground: var(--on-surface);
+    --muted: var(--surface-container-low);
+    --muted-foreground: #677177;
+    --accent: var(--surface-container-low);
+    --accent-foreground: var(--on-surface);
+    --destructive: var(--error);
+    --destructive-foreground: #ffffff;
+    
+    /* We use completely transparent border to enforce "no border unless fallback" rule */
+    --border: transparent;
+    --input: var(--outline-variant);
+    --ring: var(--primary-color);
+    --radius: 0.375rem; /* md rounded corners as per prompt */
+  }
+  
+  .dark {
+    /* Optional dark mode stubs */
+    --surface: #1e262a;
+    --surface-container-low: #192023;
+    --surface-container-lowest: #141a1c;
+    --surface-container-high: #263136;
+    --outline-variant: #495459;
+    --primary-color: #6da2a2;
+    --on-primary: #0f1c1c;
+    --primary-dim: #547d7d;
+    --tertiary: #00a872;
+    --error: #e06662;
+    --on-surface: #e9ecef;
+    
+    --background: var(--surface);
+    --foreground: var(--on-surface);
+    --card: var(--surface-container-lowest);
+    --card-foreground: var(--on-surface);
+    --popover: var(--surface-container-lowest);
+    --popover-foreground: var(--on-surface);
+    --primary: var(--primary-color);
+    --primary-foreground: var(--on-primary);
+    --secondary: var(--surface-container-high);
+    --secondary-foreground: var(--on-surface);
+    --muted: var(--surface-container-low);
+    --muted-foreground: #8a969c;
+    --accent: var(--surface-container-low);
+    --accent-foreground: var(--on-surface);
+    --destructive: var(--error);
+    --destructive-foreground: #ffffff;
+    --border: transparent;
+    --input: var(--outline-variant);
+    --ring: var(--primary-color);
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
